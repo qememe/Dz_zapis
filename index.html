@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Записная книжка домашних заданий</title>
+    <style>
+      :root {
+        --bg: #f3f6fb;
+        --card: #ffffff;
+        --accent: #4169e1;
+        --accent-dark: #2f53bd;
+        --text: #1d2636;
+        --muted: #667084;
+        --border: #d8dfec;
+        --danger: #cc2f47;
+        --success: #1f8f4b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(160deg, #eef3ff, #f7f9fc 45%, #edf4f0);
+        color: var(--text);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px 16px 48px;
+      }
+
+      h1 {
+        margin: 8px 0 12px;
+        font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      @media (min-width: 900px) {
+        .layout {
+          grid-template-columns: 380px 1fr;
+          align-items: start;
+        }
+      }
+
+      .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 8px 28px rgba(22, 35, 80, 0.08);
+        padding: 16px;
+      }
+
+      .panel h2 {
+        margin-top: 0;
+        font-size: 1.15rem;
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input,
+      textarea,
+      button,
+      select {
+        font: inherit;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      textarea,
+      input[type="file"] {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #fff;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      .hint {
+        font-size: 0.86rem;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      .primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .primary:hover {
+        background: var(--accent-dark);
+      }
+
+      .secondary {
+        background: #ebf1ff;
+        color: #2746a8;
+      }
+
+      .danger {
+        background: #fff0f3;
+        color: var(--danger);
+      }
+
+      .status {
+        margin-top: 10px;
+        min-height: 1.2em;
+        font-size: 0.92rem;
+      }
+
+      .status.success {
+        color: var(--success);
+      }
+
+      .status.error {
+        color: var(--danger);
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        gap: 10px;
+      }
+
+      .toolbar .field {
+        margin-bottom: 0;
+      }
+
+      .list {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fff;
+      }
+
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 0.88rem;
+        margin-bottom: 8px;
+      }
+
+      .text {
+        white-space: pre-wrap;
+        margin-bottom: 8px;
+      }
+
+      .thumb {
+        max-width: 220px;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+      }
+
+      .empty {
+        color: var(--muted);
+        font-style: italic;
+        padding: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>📘 Записная книжка домашних заданий</h1>
+      <div class="subtitle">
+        Добавляйте задания по предметам, прикрепляйте фото и экспортируйте всё за выбранную дату в PDF.
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <h2>Новое задание</h2>
+          <form id="homeworkForm">
+            <div class="field">
+              <label for="subject">Предмет</label>
+              <input id="subject" type="text" placeholder="Например: Математика" required />
+            </div>
+            <div class="field">
+              <label for="date">Дата</label>
+              <input id="date" type="date" required />
+            </div>
+            <div class="field">
+              <label for="task">Текст домашнего задания</label>
+              <textarea id="task" placeholder="Например: решить №145, №146, выучить формулы"></textarea>
+            </div>
+            <div class="field">
+              <label for="image">Картинка (необязательно)</label>
+              <input id="image" type="file" accept="image/*" />
+              <div class="hint">Поддерживаются изображения из галереи или снимки задания.</div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="submit">Сохранить задание</button>
+              <button class="secondary" id="clearAllBtn" type="button">Очистить всё</button>
+            </div>
+            <div id="formStatus" class="status"></div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Список домашних заданий</h2>
+          <div class="toolbar">
+            <div class="field">
+              <label for="filterDate">Фильтр по дате</label>
+              <input id="filterDate" type="date" />
+            </div>
+            <button id="resetFilter" class="secondary" type="button">Показать всё</button>
+            <button id="exportPdf" class="primary" type="button">Экспорт в PDF по дате</button>
+          </div>
+          <div id="list" class="list"></div>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script>
+      const form = document.getElementById('homeworkForm');
+      const subjectInput = document.getElementById('subject');
+      const dateInput = document.getElementById('date');
+      const taskInput = document.getElementById('task');
+      const imageInput = document.getElementById('image');
+      const formStatus = document.getElementById('formStatus');
+      const list = document.getElementById('list');
+      const filterDate = document.getElementById('filterDate');
+      const clearAllBtn = document.getElementById('clearAllBtn');
+      const resetFilterBtn = document.getElementById('resetFilter');
+      const exportPdfBtn = document.getElementById('exportPdf');
+
+      const STORAGE_KEY = 'homeworkNotebookEntries';
+      let entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+      const escapeHtml = (value) =>
+        value
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+
+      const formatDate = (dateStr) => {
+        const date = new Date(dateStr + 'T00:00:00');
+        return Number.isNaN(date.getTime())
+          ? dateStr
+          : new Intl.DateTimeFormat('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
+      };
+
+      const saveEntries = () => {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+      };
+
+      const readImageAsDataUrl = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+      const setStatus = (message, type = 'success') => {
+        formStatus.textContent = message;
+        formStatus.className = `status ${type}`;
+      };
+
+      const getFilteredEntries = () => {
+        const selectedDate = filterDate.value;
+        if (!selectedDate) {
+          return entries;
+        }
+        return entries.filter((item) => item.date === selectedDate);
+      };
+
+      const renderEntries = () => {
+        const data = getFilteredEntries();
+        if (!data.length) {
+          list.innerHTML = '<div class="empty">Нет заданий для отображения.</div>';
+          return;
+        }
+
+        list.innerHTML = data
+          .map(
+            (item) => `
+              <article class="card">
+                <h3>${escapeHtml(item.subject)}</h3>
+                <div class="meta">Дата: ${formatDate(item.date)}</div>
+                ${item.text ? `<div class="text">${escapeHtml(item.text)}</div>` : ''}
+                ${item.image ? `<img class="thumb" src="${item.image}" alt="Приложенное фото задания" />` : ''}
+              </article>
+            `,
+          )
+          .join('');
+      };
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const subject = subjectInput.value.trim();
+        const date = dateInput.value;
+        const text = taskInput.value.trim();
+        const file = imageInput.files[0];
+
+        if (!subject || !date) {
+          setStatus('Укажите предмет и дату.', 'error');
+          return;
+        }
+
+        if (!text && !file) {
+          setStatus('Добавьте текст задания или прикрепите картинку.', 'error');
+          return;
+        }
+
+        let image = '';
+        if (file) {
+          try {
+            image = await readImageAsDataUrl(file);
+          } catch {
+            setStatus('Не удалось прочитать картинку.', 'error');
+            return;
+          }
+        }
+
+        entries.push({
+          id: crypto.randomUUID(),
+          subject,
+          date,
+          text,
+          image,
+          createdAt: new Date().toISOString(),
+        });
+
+        entries.sort((a, b) => a.date.localeCompare(b.date) || a.subject.localeCompare(b.subject, 'ru'));
+        saveEntries();
+        renderEntries();
+
+        form.reset();
+        setStatus('Задание успешно сохранено.');
+      });
+
+      filterDate.addEventListener('input', renderEntries);
+
+      resetFilterBtn.addEventListener('click', () => {
+        filterDate.value = '';
+        renderEntries();
+      });
+
+      clearAllBtn.addEventListener('click', () => {
+        if (!confirm('Удалить все сохраненные задания?')) return;
+        entries = [];
+        saveEntries();
+        renderEntries();
+        setStatus('Все задания удалены.', 'success');
+      });
+
+      const wrapText = (doc, text, x, y, width, lineHeight) => {
+        const lines = doc.splitTextToSize(text, width);
+        lines.forEach((line) => {
+          doc.text(line, x, y.value);
+          y.value += lineHeight;
+        });
+      };
+
+      exportPdfBtn.addEventListener('click', async () => {
+        const selectedDate = filterDate.value;
+        if (!selectedDate) {
+          alert('Для экспорта выберите дату в поле фильтра.');
+          return;
+        }
+
+        const dayItems = entries.filter((item) => item.date === selectedDate);
+        if (!dayItems.length) {
+          alert('На эту дату нет заданий.');
+          return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 40;
+        const contentWidth = pageWidth - margin * 2;
+        const y = { value: margin };
+
+        const newPageIfNeeded = (requiredHeight = 24) => {
+          if (y.value + requiredHeight > pageHeight - margin) {
+            doc.addPage();
+            y.value = margin;
+          }
+        };
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text(`Домашние задания на ${formatDate(selectedDate)}`, margin, y.value);
+        y.value += 28;
+
+        for (const [index, item] of dayItems.entries()) {
+          newPageIfNeeded(120);
+
+          doc.setDrawColor(210, 220, 235);
+          doc.line(margin, y.value - 12, pageWidth - margin, y.value - 12);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(13);
+          doc.text(`${index + 1}. ${item.subject}`, margin, y.value + 6);
+          y.value += 24;
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(11);
+
+          if (item.text) {
+            wrapText(doc, item.text, margin, y, contentWidth, 16);
+            y.value += 8;
+          }
+
+          if (item.image) {
+            try {
+              const imgWidth = 230;
+              const imgHeight = 150;
+              newPageIfNeeded(imgHeight + 10);
+              doc.addImage(item.image, 'JPEG', margin, y.value, imgWidth, imgHeight, undefined, 'FAST');
+              y.value += imgHeight + 12;
+            } catch {
+              newPageIfNeeded(20);
+              doc.setTextColor(170, 60, 60);
+              doc.text('Изображение не удалось вставить в PDF.', margin, y.value);
+              doc.setTextColor(0, 0, 0);
+              y.value += 20;
+            }
+          }
+
+          y.value += 10;
+        }
+
+        doc.save(`domashnee-zadanie-${selectedDate}.pdf`);
+      });
+
+      renderEntries();
+    </script>
+  </body>
+</html>
